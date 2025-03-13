@@ -1,19 +1,12 @@
 FROM php:8.3-fpm
 
-RUN apt-get update && apt-get install -y \
-    default-mysql-client \
-    apt-utils \
-    bash \
-    iputils-ping \
-    coreutils \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libicu-dev \
-    libpq-dev \
     libpng-dev \
     libzip-dev \
     zip \
     unzip \
     git \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN docker-php-ext-install \
@@ -21,9 +14,8 @@ RUN docker-php-ext-install \
     intl \
     bcmath \
     gd \
-    zip
-
-RUN pecl install redis\
+    zip \
+    && pecl install redis \
     && docker-php-ext-enable redis
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -42,4 +34,5 @@ RUN echo "# Custom global bash configuration" > /etc/bash.bashrc \
 COPY --chown=www-data:www-data . /var/www
 
 USER www-data
+
 WORKDIR /var/www
